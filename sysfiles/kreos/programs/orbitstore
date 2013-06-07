@@ -1,0 +1,301 @@
+if kapi20 then
+	os.unloadAPI("/kreos/api/kapi20")
+	os.loadAPI("/kreos/api/kapi20")
+elseif not kapi20 then
+	os.loadAPI("/kreos/api/kapi20")
+end
+if not load then
+	os.loadAPI("/kreos/api/load")
+end
+if not config then
+	os.loadAPI("/kreos/api/config")
+end
+if not esl then
+	os.loadAPI("/kreos/api/esl")
+end
+if not orbit then
+	os.loadAPI("/kreos/api/orbit")
+end
+
+function fileDownload(path, url)
+	local text = http.get( url ).readAll()
+	local file = assert( io.open( path, "w" ) )
+	file:write( text )
+	file:close()
+end
+
+if kreStoreTiles == nil then
+	fileDownload("/kreos/config/storetiles.kre", "http://bitnut.de/kreos20/storetiles.kre")
+	kreStoreTiles = config.new("/kreos/config/storetiles.kre")
+	kreStoreTiles:load()
+	kreStoreTiles:getBoolean("tile1.used", false)
+	kreStoreTiles:getString("tile1.link", "/")
+	kreStoreTiles:getNumber("tile1.color", colors.cyan)
+	kreStoreTiles:getString("tile1.text", "Not Set")
+	kreStoreTiles:getString("tile1.description", "Not Set")
+	kreStoreTiles:getBoolean("tile2.used", false)
+	kreStoreTiles:getString("tile2.link", "/")
+	kreStoreTiles:getNumber("tile2.color", colors.cyan)
+	kreStoreTiles:getString("tile2.text", "Not Set")
+	kreStoreTiles:getString("tile2.description", "Not Set")
+	kreStoreTiles:getBoolean("tile3.used", false)
+	kreStoreTiles:getString("tile3.link", "/")
+	kreStoreTiles:getNumber("tile3.color", colors.cyan)
+	kreStoreTiles:getString("tile3.text", "Not Set")
+	kreStoreTiles:getString("tile3.description", "Not Set")
+	kreStoreTiles:getBoolean("tile4.used", false)
+	kreStoreTiles:getString("tile4.link", "/")
+	kreStoreTiles:getNumber("tile4.color", colors.cyan)
+	kreStoreTiles:getString("tile4.text", "Not Set")
+	kreStoreTiles:getString("tile4.description", "Not Set")
+	kreStoreTiles:getBoolean("tile5.used", false)
+	kreStoreTiles:getString("tile5.link", "/")
+	kreStoreTiles:getNumber("tile5.color", colors.cyan)
+	kreStoreTiles:getString("tile5.text", "Not Set")
+	kreStoreTiles:getString("tile5.description", "Not Set")
+	kreStoreTiles:getBoolean("tile6.used", false)
+	kreStoreTiles:getString("tile6.link", "/")
+	kreStoreTiles:getNumber("tile6.color", colors.cyan)
+	kreStoreTiles:getString("tile6.text", "Not Set")
+	kreStoreTiles:getString("tile6.description", "Not Set")
+	kreStoreTiles:getBoolean("tile7.used", false)
+	kreStoreTiles:getString("tile7.link", "/")
+	kreStoreTiles:getNumber("tile7.color", colors.cyan)
+	kreStoreTiles:getString("tile7.text", "Not Set")
+	kreStoreTiles:getString("tile7.description", "Not Set")
+	kreStoreTiles:getBoolean("tile8.used", false)
+	kreStoreTiles:getString("tile8.link", "/")
+	kreStoreTiles:getNumber("tile8.color", colors.cyan)
+	kreStoreTiles:getString("tile8.text", "Not Set")
+	kreStoreTiles:getString("tile8.description", "Not Set")
+	kreStoreTiles:getBoolean("tile9.used", false)
+	kreStoreTiles:getString("tile9.link", "/")
+	kreStoreTiles:getNumber("tile9.color", colors.cyan)
+	kreStoreTiles:getString("tile9.text", "Not Set")
+	kreStoreTiles:getString("tile9.description", "Not Set")
+	kreStoreTiles:getBoolean("tile10.used", false)
+	kreStoreTiles:getString("tile10.link", "/")
+	kreStoreTiles:getNumber("tile10.color", colors.cyan)
+	kreStoreTiles:getString("tile10.text", "Not Set")
+	kreStoreTiles:getString("tile10.description", "Not Set")
+	kreStoreTiles:save()
+end
+
+local w, h = term.getSize()
+
+exitOrbitWindow = false
+
+function pastebinDownload(tile)
+	orbit.disableScreen("OrbitStore")
+	
+	exitOrbitWindow = false
+	
+	term.setBackgroundColor(colors.white)
+	term.clear()
+	term.setTextColor(colors.gray)
+	term.setBackgroundColor(colors.gray)
+	for y=1,4 do
+		term.setCursorPos(5,y)
+		write(" ")
+	end
+	for y=11,w-5 do
+		term.setCursorPos(5,y)
+		write(" ")
+	end
+	
+	term.setBackgroundColor(colors.white)
+	
+	local tileDescription = kreStoreTiles:getString("tile" ..tile.. ".description", "Not Set")
+	term.setCursorPos(1,6)
+	write(tileDescription)
+	
+	kapi20.addButton("back", "Back", 7, h-2, true, function(buttonFunction)
+		kapi20.disableButton("back")
+		kapi20.disableButton("download")
+		
+		orbit.enableScreen("OrbitStore")
+		exitOrbitWindow = true
+	end)
+	kapi20.addButton("download", "Download", 13, h-2, true, function(buttonFunction)
+		kapi20.disableButton("back")
+		kapi20.disableButton("download")
+		
+		term.setCursorPos(7,h)
+		term.setTextColor(colors.gray)
+		term.setBackgroundColor(colors.white)
+		write("Download program from Pastebin...")
+		local response = http.get("http://pastebin.com/raw.php?i="..textutils.urlEncode(kreStoreTiles:getString("tile" ..tile.. ".link", "/")))
+		if response then
+			term.setCursorPos(7,h)
+			write("                                 ")
+			term.setCursorPos(7,h)
+			write("Download successfull.")
+			local sResponse = response.readAll()
+			response.close()
+			local file = assert( io.open("/kreos/programs/" ..kreStoreTiles:getString("tile" ..tile.. ".text", "Not Set"), "w" ) )
+			file:write(sResponse)
+			file:close()
+		else
+			term.setCursorPos(7,h)
+			write("                                 ")
+			term.setCursorPos(7,h)
+			write("Download failed.")
+		end
+		term.setCursorPos(7,h)
+		write("                                 ")
+		term.setCursorPos(7,h)
+		write("Writing to configuration...")
+		if kreTiles == nil then
+			kreTiles = config.new("/kreos/config/tiles.kre")
+			kreTiles:load()
+		end
+		
+		for i=1,10 do
+			if kreTiles:getBoolean("tile" ..i.. ".used", false) == false then
+				tileSystem = i
+				break
+			end
+		end
+		
+		kreTiles:getBoolean("tile" ..tileSystem.. ".used", true)
+		kreTiles:reset("tile" ..tileSystem.. ".used")
+		kreTiles:getString("tile" ..tileSystem.. ".text", kreStoreTiles:getString("tile" ..tile.. ".text", "Not Set"))
+		kreTiles:reset("tile" ..tileSystem.. ".text")
+		kreTiles:getString("tile" ..tileSystem.. ".link", "/kreos/programs/" ..kreStoreTiles:getString("tile" ..tile.. ".text", "Not Set"))
+		kreTiles:reset("tile" ..tileSystem.. ".link")
+		kreTiles:getNumber("tile" ..tileSystem.. ".color", kreStoreTiles:getNumber("tile" ..tile.. ".color", colors.cyan))
+		kreTiles:reset("tile" ..tileSystem.. ".color")
+		kreTiles:save()
+		term.setCursorPos(7,h)
+		write("                           ")
+		term.setCursorPos(7,h)
+		write("Your computer will restart now.")
+		for i=5,1,-1 do
+			term.setCursorPos(7+string.len("Your computer will restart now.")+1,h)
+			write("(" ..i.. ")")
+			sleep(1)
+		end
+		os.reboot()
+	end)
+	
+	repeat
+		local eventType, button, x, y, i1, i2, i3 = kapi20.pullEvent()
+		
+		sleep(0.1)
+	until exitOrbitWindow == true
+end
+
+orbit.createOrbitScreen("OrbitStore")
+orbit.addOrbit("OrbitScreenButton", "OrbitStore", "Orbit Screen", 2, 2, true, colors.lightGray, function(orbitFunction)
+	
+	orbit.disableScreen("OrbitStore")
+	error()
+end)
+orbit.addOrbit("UpdateCenter", "OrbitStore", "UpdateCenter", 2, 8, true, colors.lightGray, function(orbitFunction)
+	term.setTextColor(colors.white)
+	print("Will be implementated soon in version 2.1!")
+end)
+
+orbit.addOrbit("orbitLeft", "OrbitStore", "<-----<-----<-----", 14, 14, true, colors.lightGray, function(orbitFunction)
+	
+end)
+orbit.addOrbit("orbitRight", "OrbitStore", "----->----->----->", 41, 14, true, colors.lightGray, function(orbitFunction)
+	
+end)
+
+if kreStoreTiles:getBoolean("tile1.used", false) == true then
+	orbit.addOrbit("orbittile1", "OrbitStore", kreStoreTiles:getString("tile1.text", "Not Set"), 14, 2, true, kreStoreTiles:getNumber("tile1.color", colors.cyan), function(orbitFunction)
+		pastebinDownload(1)
+	end)
+else
+	orbit.addOrbit("orbittile1", "OrbitStore", kreStoreTiles:getString("tile1.text", "Not Set"), 14, 2, false, kreStoreTiles:getNumber("tile1.color", colors.cyan), function(orbitFunction)
+
+	end)
+end
+if kreStoreTiles:getBoolean("tile2.used", false) == true then
+	orbit.addOrbit("orbittile2", "OrbitStore", kreStoreTiles:getString("tile2.text", "Not Set"), 23, 2, true, kreStoreTiles:getNumber("tile2.color", colors.cyan), function(orbitFunction)
+		pastebinDownload(2)
+	end)
+else
+	orbit.addOrbit("orbittile2", "OrbitStore", kreStoreTiles:getString("tile2.text", "Not Set"), 23, 2, false, kreStoreTiles:getNumber("tile2.color", colors.cyan), function(orbitFunction)
+
+	end)
+end
+if kreStoreTiles:getBoolean("tile3.used", false) == true then
+	orbit.addOrbit("orbittile3", "OrbitStore", kreStoreTiles:getString("tile3.text", "Not Set"), 32, 2, true, kreStoreTiles:getNumber("tile3.color", colors.cyan), function(orbitFunction)
+		pastebinDownload(3)
+	end)
+else
+	orbit.addOrbit("orbittile3", "OrbitStore", kreStoreTiles:getString("tile3.text", "Not Set"), 32, 2, false, kreStoreTiles:getNumber("tile3.color", colors.cyan), function(orbitFunction)
+
+	end)
+end
+if kreStoreTiles:getBoolean("tile4.used", false) == true then
+	orbit.addOrbit("orbittile4", "OrbitStore", kreStoreTiles:getString("tile4.text", "Not Set"), 41, 2, true, kreStoreTiles:getNumber("tile4.color", colors.cyan), function(orbitFunction)
+		pastebinDownload(4)
+	end)
+else
+	orbit.addOrbit("orbittile4", "OrbitStore", kreStoreTiles:getString("tile4.text", "Not Set"), 41, 2, false, kreStoreTiles:getNumber("tile4.color", colors.cyan), function(orbitFunction)
+
+	end)
+end
+if kreStoreTiles:getBoolean("tile5.used", false) == true then
+	orbit.addOrbit("orbittile5", "OrbitStore", kreStoreTiles:getString("tile5.text", "Not Set"), 14, 8, true, kreStoreTiles:getNumber("tile5.color", colors.cyan), function(orbitFunction)
+		pastebinDownload(5)
+	end)
+else
+	orbit.addOrbit("orbittile5", "OrbitStore", kreStoreTiles:getString("tile5.text", "Not Set"), 14, 8, false, kreStoreTiles:getNumber("tile5.color", colors.cyan), function(orbitFunction)
+
+	end)
+end
+if kreStoreTiles:getBoolean("tile6.used", false) == true then
+	orbit.addOrbit("orbittile6", "OrbitStore", kreStoreTiles:getString("tile6.text", "Not Set"), 23, 8, true, kreStoreTiles:getNumber("tile6.color", colors.cyan), function(orbitFunction)
+		pastebinDownload(6)
+	end)
+else
+	orbit.addOrbit("orbittile6", "OrbitStore", kreStoreTiles:getString("tile6.text", "Not Set"), 23, 8, false, kreStoreTiles:getNumber("tile6.color", colors.cyan), function(orbitFunction)
+
+	end)
+end
+if kreStoreTiles:getBoolean("tile7.used", false) == true then
+	orbit.addOrbit("orbittile7", "OrbitStore", kreStoreTiles:getString("tile7.text", "Not Set"), 32, 8, true, kreStoreTiles:getNumber("tile7.color", colors.cyan), function(orbitFunction)
+		pastebinDownload(7)
+	end)
+else
+	orbit.addOrbit("orbittile7", "OrbitStore", kreStoreTiles:getString("tile7.text", "Not Set"), 32, 8, false, kreStoreTiles:getNumber("tile7.color", colors.cyan), function(orbitFunction)
+
+	end)
+end
+if kreStoreTiles:getBoolean("tile8.used", false) == true then
+	orbit.addOrbit("orbittile8", "OrbitStore", kreStoreTiles:getString("tile8.text", "Not Set"), 41, 8, true, kreStoreTiles:getNumber("tile8.color", colors.cyan), function(orbitFunction)
+		pastebinDownload(8)
+	end)
+else
+	orbit.addOrbit("orbittile8", "OrbitStore", kreStoreTiles:getString("tile8.text", "Not Set"), 41, 8, false, kreStoreTiles:getNumber("tile8.color", colors.cyan), function(orbitFunction)
+
+	end)
+end
+if kreStoreTiles:getBoolean("tile9.used", false) == true then
+	orbit.addOrbit("orbittile9", "OrbitStore", kreStoreTiles:getString("tile9.text", "Not Set"), 23, 14, true, kreStoreTiles:getNumber("tile9.color", colors.cyan), function(orbitFunction)
+		pastebinDownload(9)
+	end)
+else
+	orbit.addOrbit("orbittile9", "OrbitStore", kreStoreTiles:getString("tile9.text", "Not Set"), 23, 14, false, kreStoreTiles:getNumber("tile9.color", colors.cyan), function(orbitFunction)
+
+	end)
+end
+if kreStoreTiles:getBoolean("tile10.used", false) == true then
+	orbit.addOrbit("orbittile10", "OrbitStore", kreStoreTiles:getString("tile10.text", "Not Set"), 32, 14, true, kreStoreTiles:getNumber("tile10.color", colors.cyan), function(orbitFunction)
+		pastebinDownload(10)
+	end)
+else
+	orbit.addOrbit("orbittile10", "OrbitStore", kreStoreTiles:getString("tile10.text", "Not Set"), 32, 14, false, kreStoreTiles:getNumber("tile10.color", colors.cyan), function(orbitFunction)
+
+	end)
+end
+
+while true do
+	local eventType, button, x, y, i1, i2, i3 = orbit.PullEvent()
+	
+	sleep(0.1)
+end

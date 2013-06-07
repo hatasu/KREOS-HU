@@ -1,0 +1,351 @@
+if not kapi20 then
+	os.loadAPI("/kreos/api/kapi20")
+end
+if not load then
+	os.loadAPI("/kreos/api/load")
+end
+if not config then
+	os.loadAPI("/kreos/api/config")
+end
+if not esl then
+	os.loadAPI("/kreos/api/esl")
+end
+if not orbit then
+	os.loadAPI("/kreos/api/orbit")
+end
+
+-- kreConfig = config.new("/kreos/config/config.kre")
+-- kreConfig:load()
+-- kreUsers = config.new("/kreos/config/users.kre")
+-- kreUsers:load()
+kreTiles = config.new("/kreos/config/tiles.kre")
+kreTiles:load()
+kreTiles:getBoolean("tile1.used", false)
+kreTiles:getString("tile1.link", "/")
+kreTiles:getNumber("tile1.color", colors.cyan)
+kreTiles:getString("tile1.text", "Nincs beallitva")
+kreTiles:getBoolean("tile2.used", false)
+kreTiles:getString("tile2.link", "/")
+kreTiles:getNumber("tile2.color", colors.cyan)
+kreTiles:getString("tile2.text", "Nincs beallitva")
+kreTiles:getBoolean("tile3.used", false)
+kreTiles:getString("tile3.link", "/")
+kreTiles:getNumber("tile3.color", colors.cyan)
+kreTiles:getString("tile3.text", "Nincs beallitva")
+kreTiles:getBoolean("tile4.used", false)
+kreTiles:getString("tile4.link", "/")
+kreTiles:getNumber("tile4.color", colors.cyan)
+kreTiles:getString("tile4.text", "Nincs beallitva")
+kreTiles:getBoolean("tile5.used", false)
+kreTiles:getString("tile5.link", "/")
+kreTiles:getNumber("tile5.color", colors.cyan)
+kreTiles:getString("tile5.text", "Nincs beallitva")
+kreTiles:getBoolean("tile6.used", false)
+kreTiles:getString("tile6.link", "/")
+kreTiles:getNumber("tile6.color", colors.cyan)
+kreTiles:getString("tile6.text", "Nincs beallitva")
+kreTiles:getBoolean("tile7.used", false)
+kreTiles:getString("tile7.link", "/")
+kreTiles:getNumber("tile7.color", colors.cyan)
+kreTiles:getString("tile7.text", "Nincs beallitva")
+kreTiles:getBoolean("tile8.used", false)
+kreTiles:getString("tile8.link", "/")
+kreTiles:getNumber("tile8.color", colors.cyan)
+kreTiles:getString("tile8.text", "Nincs beallitva")
+kreTiles:getBoolean("tile9.used", false)
+kreTiles:getString("tile9.link", "/")
+kreTiles:getNumber("tile9.color", colors.cyan)
+kreTiles:getString("tile9.text", "Nincs beallitva")
+kreTiles:getBoolean("tile10.used", false)
+kreTiles:getString("tile10.link", "/")
+kreTiles:getNumber("tile10.color", colors.cyan)
+kreTiles:getString("tile10.text", "Nincs beallitva")
+kreTiles:save()
+
+local w, h = term.getSize()
+
+local kreosLogo = {
+	"3   3 3333  3333  777   777             bbb    ",
+	"3   3 3   3 3    7   7 7                  b    ",
+	"3  3  3   3 3    7   7 7    333  3  b     b bbb",
+	"3  3  3   3 3    7   7  77  3 3  3   3  bbb b b",
+	"333   3333  333  7   7    7 3 3bb333b33 b   b b",
+	"3  3  3   3 3    7   7    7 3 3b 3 3b3  b   b b",
+	"3  3  3   3 3     777  777  333b 333b33 bbb3bbb",
+	"3   3 3   3 3                                  ",
+	"3   3 3   3 33333333333333333333333333333333333",
+}
+local bar = load.init(load.LOGO_IS_LOAD, kreosLogo, 5, nil, 18, colors.red, "KREOS kikapcsolas...", "KREOS Orbit V2.0", "By hatasu")
+
+function shutdownScreen()
+	bar:triggerUpdate("Fajlok elmentese...")
+	sleep(0.5)
+	kreConfig:save()
+	kreUsers:save()
+	bar:triggerUpdate("API bezaras...")
+	sleep(0.5)
+	if kapi20 then
+		os.unloadAPI("/kreos/api/kapi20")
+	end
+	bar:triggerUpdate("API bezaras...")
+	sleep(0.5)
+	if config then
+		os.unloadAPI("/kreos/api/config")
+	end
+	bar:triggerUpdate("API bezaras...")
+	sleep(0.5)
+	if esl then
+		os.unloadAPI("/kreos/api/esl")
+	end
+	bar:triggerUpdate("Koszi, hogy a KREOS-t hasznaltad!")
+	sleep(1)
+end
+
+local function shutdownBar()
+	bar:run(true)
+end
+
+function shutdown(shutdownType)
+	parallel.waitForAll(shutdownBar, shutdownScreen)
+	
+	if shutdownType == "shutdown" then
+		os.shutdown()
+	elseif shutdownType == "reboot" then
+		os.reboot()
+	end
+end
+
+function runProgram(tile)
+	orbit.disableScreen("OrbitScreen")
+	
+	if kreTiles:getString("tile" ..tile.. ".name", "Nincs beallitva") == "NPaintPro" then
+		term.setBackgroundColor(colors.gray)
+		term.setCursorPos(1,h-7)
+		term.clearLine()
+		term.setBackgroundColor(colors.white)
+		for y=h-6,h do
+			for x=1,w do
+				term.setCursorPos(x,y)
+				write(" ")
+			end
+		end
+		term.setTextColor(colors.cyan)
+		term.setCursorPos(14,h-4)
+		write("Add meg a fajl nevet es nyomj entert...")
+		kapi20.addInputBox("filename", 25, 14, h-2, true, "text", nil)
+		local filename = kapi20.inputBoxGetValue("filename")
+		repeat
+			local eventType, button, x, y, i1, i2, i3 = orbit.PullEvent()
+			
+			sleep(0.1)
+		until filename ~= nil
+		kapi20.disableInputBox("filename")
+		shell.run(kreTiles:getString("tile" ..tile.. ".link", "/"), filename)
+	else
+		shell.run(kreTiles:getString("tile" ..tile.. ".link", "/"))
+	end
+	orbit.enableScreen("OrbitScreen")
+end
+
+orbit.createOrbitScreen("OrbitScreen")
+orbit.addOrbit("OrbitStoreButton", "OrbitScreen", "Orbit Store", 2, 2, true, colors.lightGray, function(orbitFunction)
+	orbit.disableScreen("OrbitScreen")
+	shell.run("/kreos/programs/orbitstore")
+	orbit.enableScreen("OrbitScreen")
+end)
+orbit.addOrbit("SystemPanel", "OrbitScreen", "SystemPanel", 2, 8, true, colors.lightGray, function(orbitFunction)
+	orbit.disableScreen("OrbitScreen")
+	orbit.createOrbitScreen("ControlPanel")
+
+	closeControlPanel = false
+
+	orbit.addOrbit("Bezar", "ControlPanel", "Bezar", 2, 2, true, colors.lightGray, function(orbitFunction)
+		closeControlPanel = true
+	end)
+
+	term.setTextColor(colors.gray)
+	term.setBackgroundColor(colors.white)
+	term.setCursorPos(14, 2)
+	write("Hamarosan!")
+	term.setCursorPos(14, 4)
+	write("...majd ha kitalalom")
+	term.setCursorPos(14, 5)
+	write("min kene valtoztatni.")
+
+	while not closeControlPanel do
+		os.startTimer(0.1)
+		local eventType, button, x, y, i1, i2, i3 = orbit.PullEvent()
+		
+		sleep(0.1)
+	end
+	orbit.disableScreen("ControlPanel")
+	orbit.enableScreen("OrbitScreen")
+
+end)
+orbit.addOrbit("OrbitBar", "OrbitScreen", "Orbit Bar", 2, 14, true, colors.lightGray, function(orbitFunction)
+	orbit.disableScreen("OrbitScreen")
+	term.setBackgroundColor(colors.gray)
+	term.setCursorPos(1,h-7)
+	term.clearLine()
+	term.setBackgroundColor(colors.white)
+	for y=h-6,h do
+		for x=1,w do
+			term.setCursorPos(x,y)
+			write(" ")
+		end
+	end
+	
+	closePowerBar = false
+	
+	orbit.addOrbit("Bezar", "PowerBar", "Bezar", 2, h-5, true, colors.lightGray, function(orbitFunction)
+		closePowerBar = true
+	end)
+	orbit.addOrbit("Ujrainditas", "PowerBar", "Ujrainditas", 14, h-5, true, colors.lightGray, function(orbitFunction)
+		shutdown("reboot")
+	end)
+	orbit.addOrbit("Leallitas", "PowerBar", "Leallitas", 23, h-5, true, colors.lightGray, function(orbitFunction)
+		shutdown("shutdown")
+	end)
+	orbit.addOrbit("Nevjegy", "PowerBar", "Nevjegy", 41, h-5, true, colors.lightGray, function(orbitFunction)
+		orbit.disableScreen("PowerBar")
+		
+		closeAboutScreen = false
+		
+		orbit.createOrbitScreen("AboutScreen")
+		orbit.addOrbit("Bezar", "AboutScreen", "Bezar", 2, 2, true, colors.lightGray, function(orbitFunction)
+			closeAboutScreen = true
+		end)
+		term.setTextColor(colors.gray)
+		term.setBackgroundColor(colors.white)
+		term.setCursorPos(14, 2)
+		write("(c) 2012 - 2013 kornichen munkajabol. All rights")
+		term.setCursorPos(14, 3)
+		write("reserved.")
+		term.setCursorPos(14, 5)
+		write("Koszonet mindenkinek, aki hozzajarult")
+		term.setCursorPos(14, 6)
+		write("a programhoz.")
+		
+		while not closeAboutScreen do
+			os.startTimer(0.1)	
+			local eventType, button, x, y, i1, i2, i3 = orbit.PullEvent()
+			
+			sleep(0.1)
+		end
+		orbit.disableScreen("AboutScreen")
+		orbit.enableScreen("OrbitScreen")
+		closePowerBar = true
+	end)
+	
+	while not closePowerBar do
+		os.startTimer(0.1)
+		local eventType, button, x, y, i1, i2, i3 = orbit.PullEvent()
+		
+		sleep(0.1)
+	end
+	orbit.disableScreen("PowerBar")
+	orbit.enableScreen("OrbitScreen")
+end)
+orbit.addOrbit("Bal", "OrbitScreen", "<-----<-----<-----", 14, 14, true, colors.lightGray, function(orbitFunction)
+	
+end)
+orbit.addOrbit("Jobb", "OrbitScreen", "----->----->----->", 41, 14, true, colors.lightGray, function(orbitFunction)
+	
+end)
+
+if kreTiles:getBoolean("tile1.used", false) == true then
+	orbit.addOrbit("tile1", "OrbitScreen", kreTiles:getString("tile1.text", "Nincs beallitva"), 14, 2, true, kreTiles:getNumber("tile1.color", colors.cyan), function(orbitFunction)
+		runProgram(1)
+	end)
+else
+	orbit.addOrbit("tile1", "OrbitScreen", kreTiles:getString("tile1.text", "Nincs beallitva"), 14, 2, false, kreTiles:getNumber("tile1.color", colors.cyan), function(orbitFunction)
+		kreTiles:getString("tile1.link", "/")
+	end)
+end
+if kreTiles:getBoolean("tile2.used", false) == true then
+	orbit.addOrbit("tile2", "OrbitScreen", kreTiles:getString("tile2.text", "Nincs beallitva"), 23, 2, true, kreTiles:getNumber("tile2.color", colors.cyan), function(orbitFunction)
+		runProgram(2)
+	end)
+else
+	orbit.addOrbit("tile2", "OrbitScreen", kreTiles:getString("tile2.text", "Nincs beallitva"), 23, 2, false, kreTiles:getNumber("tile2.color", colors.cyan), function(orbitFunction)
+		kreTiles:getString("tile2.link", "/")
+	end)
+end
+if kreTiles:getBoolean("tile3.used", false) == true then
+	orbit.addOrbit("tile3", "OrbitScreen", kreTiles:getString("tile3.text", "Nincs beallitva"), 32, 2, true, kreTiles:getNumber("tile3.color", colors.cyan), function(orbitFunction)
+		runProgram(3)
+	end)
+else
+	orbit.addOrbit("tile3", "OrbitScreen", kreTiles:getString("tile3.text", "Nincs beallitva"), 32, 2, false, kreTiles:getNumber("tile3.color", colors.cyan), function(orbitFunction)
+		kreTiles:getString("tile3.link", "/")
+	end)
+end
+if kreTiles:getBoolean("tile4.used", false) == true then
+	orbit.addOrbit("tile4", "OrbitScreen", kreTiles:getString("tile4.text", "Nincs beallitva"), 41, 2, true, kreTiles:getNumber("tile4.color", colors.cyan), function(orbitFunction)
+		runProgram(4)
+	end)
+else
+	orbit.addOrbit("tile4", "OrbitScreen", kreTiles:getString("tile4.text", "Nincs beallitva"), 41, 2, false, kreTiles:getNumber("tile4.color", colors.cyan), function(orbitFunction)
+		kreTiles:getString("tile4.link", "/")
+	end)
+end
+if kreTiles:getBoolean("tile5.used", false) == true then
+	orbit.addOrbit("tile5", "OrbitScreen", kreTiles:getString("tile5.text", "Nincs beallitva"), 14, 8, true, kreTiles:getNumber("tile5.color", colors.cyan), function(orbitFunction)
+		runProgram(5)
+	end)
+else
+	orbit.addOrbit("tile5", "OrbitScreen", kreTiles:getString("tile5.text", "Nincs beallitva"), 14, 8, false, kreTiles:getNumber("tile5.color", colors.cyan), function(orbitFunction)
+		kreTiles:getString("tile5.link", "/")
+	end)
+end
+if kreTiles:getBoolean("tile6.used", false) == true then
+	orbit.addOrbit("tile6", "OrbitScreen", kreTiles:getString("tile6.text", "Nincs beallitva"), 23, 8, true, kreTiles:getNumber("tile6.color", colors.cyan), function(orbitFunction)
+		runProgram(6)
+	end)
+else
+	orbit.addOrbit("tile6", "OrbitScreen", kreTiles:getString("tile6.text", "Nincs beallitva"), 23, 8, false, kreTiles:getNumber("tile6.color", colors.cyan), function(orbitFunction)
+		kreTiles:getString("tile6.link", "/")
+	end)
+end
+if kreTiles:getBoolean("tile7.used", false) == true then
+	orbit.addOrbit("tile7", "OrbitScreen", kreTiles:getString("tile7.text", "Nincs beallitva"), 32, 8, true, kreTiles:getNumber("tile7.color", colors.cyan), function(orbitFunction)
+		runProgram(7)
+	end)
+else
+	orbit.addOrbit("tile7", "OrbitScreen", kreTiles:getString("tile7.text", "Nincs beallitva"), 32, 8, false, kreTiles:getNumber("tile7.color", colors.cyan), function(orbitFunction)
+		kreTiles:getString("tile7.link", "/")
+	end)
+end
+if kreTiles:getBoolean("tile8.used", false) == true then
+	orbit.addOrbit("tile8", "OrbitScreen", kreTiles:getString("tile8.text", "Nincs beallitva"), 41, 8, true, kreTiles:getNumber("tile8.color", colors.cyan), function(orbitFunction)
+		runProgram(8)
+	end)
+else
+	orbit.addOrbit("tile8", "OrbitScreen", kreTiles:getString("tile8.text", "Nincs beallitva"), 41, 8, false, kreTiles:getNumber("tile8.color", colors.cyan), function(orbitFunction)
+		kreTiles:getString("tile8.link", "/")
+	end)
+end
+if kreTiles:getBoolean("tile9.used", false) == true then
+	orbit.addOrbit("tile9", "OrbitScreen", kreTiles:getString("tile9.text", "Nincs beallitva"), 23, 14, true, kreTiles:getNumber("tile9.color", colors.cyan), function(orbitFunction)
+		runProgram(9)
+	end)
+else
+	orbit.addOrbit("tile9", "OrbitScreen", kreTiles:getString("tile9.text", "Nincs beallitva"), 23, 14, false, kreTiles:getNumber("tile9.color", colors.cyan), function(orbitFunction)
+		kreTiles:getString("tile9.link", "/")
+	end)
+end
+if kreTiles:getBoolean("tile10.used", false) == true then
+	orbit.addOrbit("tile10", "OrbitScreen", kreTiles:getString("tile10.text", "Nincs beallitva"), 32, 14, true, kreTiles:getNumber("tile10.color", colors.cyan), function(orbitFunction)
+		runProgram(10)
+	end)
+else
+	orbit.addOrbit("tile10", "OrbitScreen", kreTiles:getString("tile10.text", "Nincs beallitva"), 32, 14, false, kreTiles:getNumber("tile10.color", colors.cyan), function(orbitFunction)
+		kreTiles:getString("tile10.link", "/")
+	end)
+end
+
+while true do
+	local eventType, button, x, y, i1, i2, i3 = orbit.PullEvent()
+	
+	sleep(0.1)
+end

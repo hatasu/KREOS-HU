@@ -1,0 +1,10 @@
+#####
+/startup
+/kreos/sys
+/kreos/api/config
+/kreos/api/esl
+/kreos/api/kapi20
+/kreos/api/load
+/kreos/api/orbit
+/kreos/pictures/kreosLogo
+/kreos/programs/orbitstore
