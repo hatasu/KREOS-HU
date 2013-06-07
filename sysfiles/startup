@@ -76,7 +76,7 @@ local function startup()
 	sleep(0.5)
 	firstStart = kreConfig:getBoolean("firstStart", true)
 	kreConfig:addCommentForKey("firstStart", "Ne valtoztass ezen, vagy a KREOS nem fog mukodni!")
-	version = kreConfig:getNumber("version", 2.0)
+	version = kreConfig:getNumber("version", 2.1)
 	kreConfig:addCommentForKey("version", "Ne valtoztass ezen, vagy a KREOS nem fog mukodni!")
 	if fs.exists("/kreos/temp") then fs.delete("/kreos/temp") end
 	fs.makeDir("/kreos/temp")
