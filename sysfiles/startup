@@ -196,7 +196,7 @@ function login()
 end
 
 if fs.exists("/kreos/temp/version.kre") then fs.delete("/kreos/temp/version.kre") end
-fileDownload("/kreos/temp/version.kre", "https://github.com/hatasu/KREOS-HU/blob/master/version.kre")
+fileDownload("/kreos/temp/version.kre", "https://raw.github.com/hatasu/KREOS-HU/master/version.kre")
 verFile = assert(fs.open("/kreos/temp/version.kre", "r"))
 newestversion = verFile.readLine()
 if tonumber(version) < tonumber(newestversion) then
@@ -206,13 +206,13 @@ if tonumber(version) < tonumber(newestversion) then
 	kapi20.addLabel("updateLabel3", "Kattints a kesobb gombra a kesobbi frissiteshez.", math.ceil(w/2)-math.ceil(string.len("Kattints a kesobb gombra a kesobbi frissiteshez.")/2), 6, true)
 	kapi20.addButton("updateButton1", "Frissit", math.ceil(w/2)-string.len("Frissit")-1, 8, true, function(button)
 		if fs.exists("/kreos/temp/updatefiles.kre") then fs.delete("/kreos/temp/updatefiles.kre") end
-		fileDownload("/kreos/temp/updatefiles.kre", "https://github.com/hatasu/KREOS-HU/blob/master/updatefiles.kre")
+		fileDownload("/kreos/temp/updatefiles.kre", "https://raw.github.com/hatasu/KREOS-HU/master/updatefiles.kre")
 		term.clear()
 		print("Frissites... Varj egy kicsit.")
 		for line in io.lines("/kreos/temp/updatefiles.kre") do
 			print("Letoltes..." ..line)
 			if fs.exists(line) then fs.delete(line) end
-			fileDownload(line, "https://github.com/hatasu/KREOS-HU/tree/master/sysfiles" ..line)
+			fileDownload(line, "https://raw.github.com/hatasu/KREOS-HU/master/sysfiles" ..line)
 		end
 		kreConfig:reset("version")
 		kreConfig:getNumber("version", newestversion)
