@@ -29,7 +29,7 @@
     fs.makeDir("/kreos/pictures")
     fs.makeDir("/kreos/programs")
     fs.makeDir("/kreos/config")
-    fileDownload("/kreos/temp/updatefiles.kre", "http://bitnut.de/kreos20/updatefiles.kre")
+    fileDownload("/kreos/temp/updatefiles.kre", "https://github.com/hatasu/KREOS-HU/blob/master/updatefiles.kre")
     term.clear()
     print("Letoltes... Egy pillanat es kesz.")
     local file = fs.open("/kreos/temp/updatefiles.kre", "r")
@@ -45,7 +45,7 @@
             if line ~= nil then
                     print("Letoltes..." ..tostring(line))
                     if fs.exists(tostring(line)) then fs.delete(tostring(line)) end
-                    fileDownload(tostring(line), "http://bitnut.de/kreos20/sysfiles/" ..tostring(line))
+                    fileDownload(tostring(line), "https://github.com/hatasu/KREOS-HU/tree/master/sysfiles/" ..tostring(line))
             else
                     break
             end

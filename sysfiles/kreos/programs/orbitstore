@@ -25,7 +25,7 @@ function fileDownload(path, url)
 end
 
 if kreStoreTiles == nil then
-	fileDownload("/kreos/config/storetiles.kre", "http://bitnut.de/kreos20/storetiles.kre")
+	fileDownload("/kreos/config/storetiles.kre", "https://github.com/hatasu/KREOS-HU/blob/master/storetiles.kre")
 	kreStoreTiles = config.new("/kreos/config/storetiles.kre")
 	kreStoreTiles:load()
 	kreStoreTiles:getBoolean("tile1.used", false)
