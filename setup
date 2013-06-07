@@ -1,0 +1,57 @@
+    if not term.isColor and not term.isColor() then
+            if os.getVersion() == "CraftOS 1.3" then
+                    print("Bocsi, de legalabb 1.4-es verzioju ComputerCraft szukseges.")
+                    error()
+            end
+           
+            print("Az oprendszer csak Advanced Computer-en mukodik")
+            error()
+    end
+     
+    if not http then
+            print("Bocsi, de a telepiteshez szukseges HTTP API-ra is.")
+            error()
+    end
+     
+    local w, h = term.getSize()
+     
+    function fileDownload(path, url)
+            local text = http.get( url ).readAll()
+            local file = assert( io.open( path, "w" ) )
+            file:write( text )
+            file:close()
+    end
+     
+    if fs.exists("/kreos") then fs.delete("/kreos") end
+    fs.makeDir("/kreos")
+    fs.makeDir("/kreos/temp")
+    fs.makeDir("/kreos/api")
+    fs.makeDir("/kreos/pictures")
+    fs.makeDir("/kreos/programs")
+    fs.makeDir("/kreos/config")
+    fileDownload("/kreos/temp/updatefiles.kre", "http://bitnut.de/kreos20/updatefiles.kre")
+    term.clear()
+    print("Letoltes... Egy pillanat es kesz.")
+    local file = fs.open("/kreos/temp/updatefiles.kre", "r")
+    local lines = {}
+    local i = 1
+    local line = file.readLine()
+    while line ~= nil do
+           
+            lines[i] = line
+            line = file.readLine()
+            i = i + 1
+           
+            if line ~= nil then
+                    print("Letoltes..." ..tostring(line))
+                    if fs.exists(tostring(line)) then fs.delete(tostring(line)) end
+                    fileDownload(tostring(line), "http://bitnut.de/kreos20/sysfiles/" ..tostring(line))
+            else
+                    break
+            end
+    end
+    file:close()
+    print("Minden fajlt letoltottunk!")
+    print("A gep most ujraindul.")
+    sleep(1)
+    os.reboot()
